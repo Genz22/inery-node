@@ -44,7 +44,7 @@ def master(master) :
     for file in FILES:
         with open(file, "a") as fs:
 
-            fs.write("--producer-name {0} \\\n".format(master["NAME"]))
+            fs.write("--master-name {0} \\\n".format(master["NAME"]))
             fs.write("--http-server-address {0} \\\n".format(master["HTTP_ADDRESS"]))
             fs.write("--p2p-listen-endpoint {0} \\\n".format(master["PEER_ADDRESS"]))
             fs.write("--p2p-peer-address {0} \\\n".format(config["GENESIS_ACCOUNT"]["PEER_ADDRESS"]))
@@ -66,16 +66,16 @@ def master(master) :
     _configIni()
 
 
-def lite(config) :
+
+def lite(lite) :
     log("Creating lite node")
     _makeScripts()
 
     os.chdir('lite.node')
     genesis = config["GENESIS_ACCOUNT"]["PEER_ADDRESS"]
 
-    lite_node = config["LITE_NODE"]
-    peer_addr = lite_node["PEER_ADDRESS"]
-    http_addr = lite_node["HTTP_ADDRESS"]
+    peer_addr = lite["PEER_ADDRESS"]
+    http_addr = lite["HTTP_ADDRESS"]
 
     for file in FILES:
         with open(file, "a") as fs:
@@ -93,6 +93,8 @@ def lite(config) :
     os.system("./genesis_start.sh")
     time.sleep(2)
     _configIni()
+    os.system("./stop.sh")
+    os.system("./start.sh")
 
 
 def add_peer(peer_addr):
@@ -141,8 +143,6 @@ def add_peer(peer_addr):
     start_file.write(first_part + sec_f + "\n--p2p-peer-address " + peer_addr + ":9010 \\" + sec_s)
     start_file.close()
 
-    os.system("./stop.sh")
-    os.system("./start.sh")
 
 def restart():
     dirs = [name for name in os.listdir(".") if os.path.isdir(name)]
@@ -193,4 +193,3 @@ if __name__ == "__main__":
         STATUS = 'lite'
         node = config["LITE_NODE"]
         lite(node)
-
